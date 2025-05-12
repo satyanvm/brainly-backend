@@ -74,7 +74,7 @@ app.post("/api/v1/signin", async (req, res) => {
 app.post("/api/v1/signout", userMiddleware, async (req, res) => {
   const signout = req.body.signout;
 
-  if (signout) {
+  if (signout) {                               
     redirect("/api/v1/signin");
     res.json({
       message: "Successfully done!",
@@ -87,9 +87,9 @@ app.post("/api/v1/content", userMiddleware, async (req, res) => {
   const type = req.body.type;
   const title = req.body.title;
 
-  try {
+  try {  
     if (!link) {
-      res.status(500).json({
+      res.status(500).json({                       
         message: "problem",
       });
       return;
@@ -109,9 +109,10 @@ app.post("/api/v1/content", userMiddleware, async (req, res) => {
         userId: req.userId,
       });
     }
+    const contents = await ContentModel.find({});
 
     res.json({
-      message: "Content added",
+      contents
     });
   } catch (e) {
     console.log(e);
@@ -149,6 +150,14 @@ app.post("/api/v1/contentdelete", userMiddleware, async (req, res) => {
     });
   }
 });
+
+app.get('/api/v1/finduserid', async(req,res) =>{
+  const userId = await UserModel.findOne(req.body.username);
+  res.json({
+    userId
+  })
+})
+
 
 app.post("/api/v1/brain/share", userMiddleware, async (req, res) => {
   const share = req.body.share;
@@ -214,7 +223,7 @@ app.get("/api/v1/brain/:shareLink", async (req, res) => {
   const user = await UserModel.findOne({
     _id: link.userId,
   });
-
+  
   if (!user) {
     res.status(411).json({
       message: "user not found, error should ideally not happen",
@@ -228,18 +237,26 @@ app.get("/api/v1/brain/:shareLink", async (req, res) => {
   });
 });
 
-app.get("/api/v1/findcontent", async (req, res) => {
-  try {
-    console.log(req.query);
+app.get("/api/v1/findcontent", async (req, res) => {   
+  try {  
+    console.log(req.query); 
     const { link } = req.query;
+    console.log("it's from findContent");
     console.log(link);
-    ContentModel.findOne({
+    const requestId = Math.random().toString(36).substring(7);
+console.log(`[${requestId}] Searching for link:`, link);
+// Later
+
+    ContentModel.findOne({  
       link: link,
     }).then((response) => {
-      const id = response?._id;
+      console.log("the response from findcontent endpoint is", response);
+      const id = response?._id
+      console.log(`[${requestId}] Found content:`, response);
+
       res.json({
         response,
-      });
+      }); 
     });
   } catch (e) {
     console.log(e);
