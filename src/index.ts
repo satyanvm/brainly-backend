@@ -116,14 +116,20 @@ app.post("/api/v1/content", userMiddleware, async (req, res) => {
     });
   } catch (e) {
     console.log(e);
-  }
+  }       
 });
 
 app.get("/api/v1/content", userMiddleware, async (req, res) => {
-  const content = await ContentModel.find({});
+  const userId = req.userId;     
+  const content = await ContentModel.find({userId:userId}); 
+  if(!content){
+    throw new Error("NO content found!"); 
+  return;
+  }
 
   res.json({
     content,
+    userId
   });
 
   // here instead of selectively selecting specific items in the contents model and then printing, i will first print all the
