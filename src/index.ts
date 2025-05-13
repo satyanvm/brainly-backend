@@ -119,6 +119,16 @@ app.post("/api/v1/content", userMiddleware, async (req, res) => {
   }       
 });
 
+app.get('/api/v1/findusername', userMiddleware, async(req,res) => {
+  const userId = req.userId;
+  const user = await UserModel.findOne({ _id: userId });
+  const username = user?.username;
+  
+  res.json({
+    username
+  })
+})
+
 app.get("/api/v1/content", userMiddleware, async (req, res) => {
   const userId = req.userId;     
   const content = await ContentModel.find({userId:userId}); 
